@@ -26,15 +26,23 @@
 # 2. Start initializing one of the disks and verify that initializing is active.
 # 3. Offline the disk.
 # 4. Online the disk.
-# 5. Suspend initializing and verify that progress did not regress.
-# 6. Repeat steps 3-4 and verify that suspended initializing does not resume.
-# 7. Resume initializing and wait for it to finish.
+# 5. Verify that initializing resumes and progress does not regress.
+# 6. Suspend initializing.
+# 7. Repeat steps 3-4 and verify that initializing does not resume.
 #
 
 DISK1=${DISKS%% *}
 DISK2="$(echo $DISKS | cut -d' ' -f2)"
 
+function cleanup
+{
+	log_must zinject -c all
+	poolexists $TESTPOOL && destroy_pool $TESTPOOL
+}
+log_onexit cleanup
+
 log_must zpool create -f $TESTPOOL mirror $DISK1 $DISK2
+log_must zinject -d $DISK1 -D 1:1 -T write $TESTPOOL
 log_must zpool initialize $TESTPOOL $DISK1
 
 log_must zpool offline $TESTPOOL $DISK1
@@ -44,13 +52,14 @@ progress="$(initialize_progress $TESTPOOL $DISK1)"
 
 log_must zpool online $TESTPOOL $DISK1
 
-log_must zpool initialize -s $TESTPOOL $DISK1
 new_progress="$(initialize_progress $TESTPOOL $DISK1)"
 [[ -z "$new_progress" ]] && \
     log_fail "Initializing did not restart after onlining"
 [[ "$progress" -le "$new_progress" ]] || \
     log_fail "Initializing lost progress after onlining"
-log_must eval "initialize_prog_line $TESTPOOL $DISK1 | grep suspended"
+log_mustnot eval "initialize_prog_line $TESTPOOL $DISK1 | grep suspended"
+
+log_must zpool initialize -s $TESTPOOL $DISK1
 action_date="$(initialize_prog_line $TESTPOOL $DISK1 | \
     sed 's/.*ed at \(.*\)).*/\1/g')"
 log_must zpool offline $TESTPOOL $DISK1
@@ -60,8 +69,5 @@ new_action_date=$(initialize_prog_line $TESTPOOL $DISK1 | \
 [[ "$action_date" != "$new_action_date" ]] && \
     log_fail "Initializing action date did not persist across offline/online"
 log_must eval "initialize_prog_line $TESTPOOL $DISK1 | grep suspended"
-
-log_must zpool initialize $TESTPOOL $DISK1
-log_must zpool wait -t initialize $TESTPOOL
 
 log_pass "Initializing performs as expected across offline/online"
