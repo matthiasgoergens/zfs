@@ -17,3 +17,10 @@ little-endian order, you will probably need to create big-endian
 streams under emulation with, e.g., QEMU. As of mid-2026, the easiest
 target for big-endian emulation is an IBM s390x CPU, which is supported
 by both QEMU and Ubuntu.
+
+make-unaligned-decompressed-payload.py derives
+unaligned-decompressed-payload.zsend.bz2 from decompress.zsend.bz2. It
+replaces one compressed WRITE with an aligned LZ4 payload that expands
+to 4,097 bytes, then regenerates the rolling Fletcher-4 checksums. The
+script is deliberately limited to the checked-in source fixture, whose
+SHA-256 it verifies; it is not a general-purpose send-stream editor.

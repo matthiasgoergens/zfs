@@ -419,6 +419,7 @@ nobase_dist_datadir_zfs_tests_tests_DATA += \
 	functional/zstream/little-endian-all-drr-types-incr-XDR.zsend.bz2 \
 	functional/zstream/decompress.zsend.bz2 \
 	functional/zstream/decompress-crypt.zsend.bz2 \
+	functional/zstream/unaligned-decompressed-payload.zsend.bz2 \
 	functional/zstream/undersized-write-lsize.zsend.bz2 \
 	functional/zstream/big-endian-long-payloads.zsend.bz2 \
 	functional/zstream/little-endian-long-payloads.zsend.bz2 \
@@ -2480,6 +2481,7 @@ nobase_dist_datadir_zfs_tests_tests_SCRIPTS += \
 	functional/zstream/setup.ksh \
 	functional/zstream/cleanup.ksh \
 	functional/zstream/zstream_checksum_001_pos.ksh \
+	functional/zstream/zstream_checksum_002_neg.ksh \
 	functional/zstream/zstream_decompress_001_pos.ksh \
 	functional/zstream/zstream_decompress_002_pos.ksh \
 	functional/zstream/zstream_decompress_003_neg.ksh \

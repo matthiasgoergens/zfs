@@ -1167,7 +1167,7 @@ tests = ['zoned_uid_001_pos', 'zoned_uid_002_pos', 'zoned_uid_003_pos',
 tags = ['functional', 'zoned_uid']
 
 [tests/functional/zstream]
-tests = ['zstream_checksum_001_pos',
+tests = ['zstream_checksum_001_pos', 'zstream_checksum_002_neg',
     'zstream_decompress_001_pos', 'zstream_decompress_002_pos',
     'zstream_decompress_003_neg', 'zstream_decompress_004_pos',
     'zstream_decompress_005_pos', 'zstream_decompress_006_neg',
