@@ -15,6 +15,7 @@
  */
 
 #include <assert.h>
+#include <err.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -128,6 +129,14 @@ chain_calc_fletcher4(queue_item_t *item_in, void *context)
 	drr_fletcher4_t *item = (drr_fletcher4_t *)item_in;
 
 	VERIFY3U(item->dp_base.dp_payload_size, >, 0);
+	if (!IS_P2ALIGNED(item->dp_base.dp_payload_size,
+	    sizeof (uint32_t))) {
+		errx(1, "packet payload size %llu is not aligned to %zu bytes "
+		    "at offset %llu",
+		    (u_longlong_t)item->dp_base.dp_payload_size,
+		    sizeof (uint32_t),
+		    (u_longlong_t)item->dp_base.dp_stream_offset);
+	}
 
 	ssize_t remaining = item->dp_base.dp_payload_size;
 	uint8_t *data = item->dp_base.dp_payload;

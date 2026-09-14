@@ -376,6 +376,10 @@ chain_read(void *item_in, void *context_in)
 	if (payload_size > UINT32_MAX) {
 		errx(1, "stated packet size is greater than uint32_t "
 		    "at offset %llu", (u_longlong_t)context->ic_offset);
+	} else if (!IS_P2ALIGNED(payload_size, sizeof (uint32_t))) {
+		errx(1, "stated packet size %llu is not aligned to %zu bytes "
+		    "at offset %llu", (u_longlong_t)payload_size,
+		    sizeof (uint32_t), (u_longlong_t)context->ic_offset);
 	} else if (payload_size > 0) {
 		uint8_t *buff = read_payload(context, payload_size);
 		if (buff == NULL)
